@@ -46,9 +46,11 @@ def openFile():
     lastGuy = ""
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
-    while(message != ""):
+    while True:
     #for x in range(0, 1000):
         message = fileData.readline()
+        if (message == ""):
+            break
         mssg = splitLine(message, lastGuy)
         if(mssg[1] == "whatsapp"):
             Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(pady=3, anchor='n')
