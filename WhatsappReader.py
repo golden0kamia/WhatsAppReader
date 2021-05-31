@@ -21,37 +21,45 @@ my_Canvas.create_window((0, 0), window=second_Frame, anchor="nw")
 
 filePath = ""
 
-def splitLine(text):
+def splitLine(text, lastGuy):
     if(text[0] >= '0' and text[0] <= '9'):
         stop1 = text.find(" - ")
         stop2 = text.find(':', stop1)
         time = text[:stop1]
-        guy = text[stop1+3:stop2]
-        msg = text[stop2+2:]
-        #print("time: "+time)
-        #print("guy: "+guy)
-        #print("msg: "+msg)
+        if(stop2 == -1):
+            guy = "whatsapp"
+            msg = text[stop1+3:]
+        else:
+            guy = text[stop1+3:stop2]
+            msg = text[stop2+2:]
     else:
         time = ""
-        guy = ""
+        guy = lastGuy
         msg = text
+    #print("time: "+time)
+    #print("guy: "+guy)
+    #print("msg: "+msg)
     return (time, guy, msg)
 
 def openFile():
-    guyG = ""
+    guyL = ""
+    lastGuy = ""
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
-    message = fileData.readline()
-    message = fileData.readline()
     while(message != ""):
-        mssg = splitLine(message)
-        if(guyG == ""):
-            guyG = mssg[1]
-        elif(mssg[1] == guyG):
-            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='left', relief='groove', bg='#b4ff63', padx=5).pack(pady=3, anchor='nw')
-        else:
-            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='left', relief='groove', bg='#40ff93', padx=5).pack(pady=3, anchor='ne', padx=20)
+    #for x in range(0, 1000):
         message = fileData.readline()
+        mssg = splitLine(message, lastGuy)
+        if(mssg[1] == "whatsapp"):
+            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(pady=3, anchor='n')
+            lastGuy = "whatsapp"
+        elif(mssg[1] == guyL or guyL == ""):
+            guyL = mssg[1]
+            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='left', relief='groove', bg='#ffffff', padx=5).pack(pady=3, anchor='nw')
+            lastGuy = guyL
+        else:
+            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='left', relief='groove', bg='#DCF8C6', padx=5).pack(pady=3, anchor='ne', padx=20)
+            lastGuy = mssg[1]
 
 
 
