@@ -24,7 +24,7 @@ my_Canvas.create_window((0, 0), window=second_Frame, anchor="nw")
 
 filePath = ""
 
-def splitLine(text, lastGuy):
+def splitLine(text, lastGuy, lastMsg):
     if(text[0] >= '0' and text[0] <= '9'):
         stop0 = text.find(" à ")
         stop1 = text.find(" - ", stop0)
@@ -41,7 +41,7 @@ def splitLine(text, lastGuy):
         day = ""
         hour = ""
         guy = lastGuy
-        msg = text
+        msg = lastMsg + text
     #print("time: "+time)
     #print("guy: "+guy)
     #print("msg: "+msg)
@@ -49,37 +49,55 @@ def splitLine(text, lastGuy):
 
 def openFile():
     guyL = ""
-    lastGuy = ""
     lastDay = ""
+    lastHour = ""
+    lastGuy = ""
+    lastMsg = ""
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
     while True:
     #for x in range(0, 1000):
-        bubble = Frame(second_Frame, relief='groove', borderwidth=2, padx=5)
         message = fileData.readline()
         if (message == ""):
             break
-        mssg = splitLine(message, lastGuy)
-        if(mssg[0] != lastDay and mssg[0] != ""):
+        mssg = splitLine(message, lastGuy, lastMsg)
+        
+        if(mssg[2] == "whatsapp"):  #Write First info message
             Label(second_Frame, text=mssg[0], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
             lastDay = mssg[0]
-        if(mssg[2] == "whatsapp"):
             Label(second_Frame, text=mssg[3], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
-            lastGuy = "whatsapp"
-        elif(mssg[2] == guyL or guyL == ""):
-            guyL = mssg[2]
-            bubble.configure(bg='#ffffff')
-            Label(bubble, text=mssg[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack(pady=0)
-            Label(bubble, text=mssg[1], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw', pady=0)
-            bubble.pack(pady=3, anchor='nw')
-            lastGuy = guyL
-        else:
-            bubble.configure(bg='#DCF8C6')
-            Label(bubble, text=mssg[3], wraplength=300, anchor='nw', justify='left', bg='#DCF8C6').pack(pady=0)
-            Label(bubble, text=mssg[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne', pady=0)
-            bubble.pack(pady=3, anchor='ne', padx=20)
+            lastGuy = "firstGuy"
+        elif(lastGuy == "firstGuy"):
+            lastHour = mssg[1]
             lastGuy = mssg[2]
-        #bubble.pack()
+            lastMsg = mssg[3]
+        elif(mssg[2] != lastGuy):
+            bubble = Frame(second_Frame, relief='groove', borderwidth=2, padx=5)
+            if(mssg[2] == guyL or guyL == ""):    #Write message of person 1 with hour
+                guyL = mssg[2]
+                bubble.configure(bg='#ffffff')
+                Label(bubble, text=lastMsg, wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
+                Label(bubble, text=lastHour, bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
+                bubble.pack(pady=3, anchor='nw')
+                lastGuy = guyL
+            else:                                   #Write message of person 2 with hour
+                bubble.configure(bg='#DCF8C6')
+                Label(bubble, text=lastMsg, wraplength=300, anchor='nw', justify='left', bg='#DCF8C6').pack()
+                Label(bubble, text=lastHour, bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
+                bubble.pack(pady=3, anchor='ne', padx=20)
+                lastGuy = mssg[2]
+            if(mssg[0] != lastDay and mssg[0] != ""):   #Write date in chat
+                Label(second_Frame, text=mssg[0], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
+                lastDay = mssg[0]
+            lastDay = mssg[0]
+            lastHour = mssg[1]
+            lastMsg = mssg[3]
+        else:
+            lastMsg = mssg[3]
+        #lastDay = mssg[0]
+        #lastHour = mssg[1]
+        #lastGuy = mssg[2]
+        #lastMsg = mssg[3]
 
 
 
