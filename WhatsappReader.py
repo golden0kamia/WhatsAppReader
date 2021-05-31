@@ -1,5 +1,8 @@
 from tkinter import *
+import tkinter.font as tkFont
 from tkinter.filedialog import *
+
+#hourFont = tkFont.Font(family='Helvetica', size=36, weight='bold')
 
 win = Tk()
 
@@ -23,9 +26,11 @@ filePath = ""
 
 def splitLine(text, lastGuy):
     if(text[0] >= '0' and text[0] <= '9'):
-        stop1 = text.find(" - ")
+        stop0 = text.find(" à ")
+        stop1 = text.find(" - ", stop0)
         stop2 = text.find(':', stop1)
-        time = text[:stop1]
+        day = text[:stop0]
+        hour = text[stop0+3:stop1]
         if(stop2 == -1):
             guy = "whatsapp"
             msg = text[stop1+3:]
@@ -33,35 +38,48 @@ def splitLine(text, lastGuy):
             guy = text[stop1+3:stop2]
             msg = text[stop2+2:]
     else:
-        time = ""
+        day = ""
+        hour = ""
         guy = lastGuy
         msg = text
     #print("time: "+time)
     #print("guy: "+guy)
     #print("msg: "+msg)
-    return (time, guy, msg)
+    return (day, hour, guy, msg)
 
 def openFile():
     guyL = ""
     lastGuy = ""
+    lastDay = ""
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
     while True:
     #for x in range(0, 1000):
+        bubble = Frame(second_Frame, relief='groove', borderwidth=2, padx=5)
         message = fileData.readline()
         if (message == ""):
             break
         mssg = splitLine(message, lastGuy)
-        if(mssg[1] == "whatsapp"):
-            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(pady=3, anchor='n')
+        if(mssg[0] != lastDay and mssg[0] != ""):
+            Label(second_Frame, text=mssg[0], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
+            lastDay = mssg[0]
+        if(mssg[2] == "whatsapp"):
+            Label(second_Frame, text=mssg[3], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
             lastGuy = "whatsapp"
-        elif(mssg[1] == guyL or guyL == ""):
-            guyL = mssg[1]
-            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='left', relief='groove', bg='#ffffff', padx=5).pack(pady=3, anchor='nw')
+        elif(mssg[2] == guyL or guyL == ""):
+            guyL = mssg[2]
+            bubble.configure(bg='#ffffff')
+            Label(bubble, text=mssg[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack(pady=0)
+            Label(bubble, text=mssg[1], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw', pady=0)
+            bubble.pack(pady=3, anchor='nw')
             lastGuy = guyL
         else:
-            Label(second_Frame, text=mssg[2], wraplength=300, anchor='nw', justify='left', relief='groove', bg='#DCF8C6', padx=5).pack(pady=3, anchor='ne', padx=20)
-            lastGuy = mssg[1]
+            bubble.configure(bg='#DCF8C6')
+            Label(bubble, text=mssg[3], wraplength=300, anchor='nw', justify='left', bg='#DCF8C6').pack(pady=0)
+            Label(bubble, text=mssg[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne', pady=0)
+            bubble.pack(pady=3, anchor='ne', padx=20)
+            lastGuy = mssg[2]
+        #bubble.pack()
 
 
 
