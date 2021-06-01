@@ -47,25 +47,24 @@ def splitLine(text, lastGuy, lastMsg):
     print("msg: "+msg)
     return (day, hour, guy, msg)
 
-def writeMessage(message, guyL):
+def writeMessage(message, guyR):
     if(message[3]==""):
         return
     bubble = Frame(second_Frame, relief='groove', borderwidth=2, padx=5)
-    if(message[2] == guyL):    #Write message of person 1 with hour
+    if(message[2] == guyR):    #Write message of person 1 with hour in the right part of the screen
+        bubble.configure(bg='#DCF8C6')
+        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='right', bg='#DCF8C6').pack()
+        Label(bubble, text=message[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
+        bubble.pack(pady=3, anchor='ne', padx=20)
+    else:                       #Write message of people 2 with hour and name in the left part of the screen (whatsapp group is possible)
         bubble.configure(bg='#ffffff')
         Label(bubble, text=message[2], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
         Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
         Label(bubble, text=message[1], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
         bubble.pack(pady=3, anchor='nw')
-    else:                       #Write message of person 2 with hour
-        bubble.configure(bg='#DCF8C6')
-        Label(bubble, text=message[2], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
-        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#DCF8C6').pack()
-        Label(bubble, text=message[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
-        bubble.pack(pady=3, anchor='ne', padx=20)
 
 def openFile():
-    guyL = ""
+    guyR = ""
     lastMssg = ["", "", "", ""]
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
@@ -76,18 +75,18 @@ def openFile():
             break
         mssg = splitLine(message, lastMssg[2], lastMssg[3])
 
-        if(mssg[2] != "" and guyL == "" and mssg[2] != "whatsapp"):
-            guyL = mssg[2]       
+        if(mssg[2] != "" and guyR == "" and mssg[2] != "whatsapp"):
+            guyR = mssg[2]       
 
-        if(mssg[2] == "whatsapp"):                          #Write whatsapp info message
-            Label(second_Frame, text=mssg[3], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5, font=('Helvetica', '8')).pack(anchor='n')
-            lastMssg[2] = mssg[2]
-        elif(lastMssg[0] != mssg[0] and mssg[0] != ""):     #Date changed -> write in chat
+        if(lastMssg[0] != mssg[0] and mssg[0] != ""):     #Date changed -> write in chat
             Label(second_Frame, text=mssg[0], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
-        if(lastMssg[2] != mssg[2] and mssg[2] != "" and lastMssg[2] != "whatsapp"):       #Guy changed -> write message
-            writeMessage(lastMssg, guyL)
-        elif(lastMssg[1] != mssg[1] and mssg[1] != ""):     #Time changes -> write message
-            writeMessage(lastMssg, guyL)
+            
+        if(mssg[2] == "whatsapp"):                                                        #Write whatsapp info message
+            Label(second_Frame, text=mssg[3], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5, font=('Helvetica', '8')).pack(anchor='n')
+        elif(lastMssg[2] != mssg[2] and mssg[2] != "" and lastMssg[2] != "whatsapp"):     #Guy changed -> write message
+            writeMessage(lastMssg, guyR)
+        elif(lastMssg[1] != mssg[1] and mssg[1] != "" and lastMssg[2] != "whatsapp"):     #Time changes -> write message
+            writeMessage(lastMssg, guyR)
         lastMssg = mssg
 
 
