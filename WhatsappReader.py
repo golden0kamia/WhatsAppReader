@@ -28,7 +28,7 @@ def splitLine(text, lastGuy, lastMsg):
     if(text[0] >= '0' and text[0] <= '9'):
         stop0 = text.find(" à ")
         stop1 = text.find(" - ", stop0)
-        stop2 = text.find(':', stop1)
+        stop2 = text.find(': ', stop1)
         day = text[:stop0]
         hour = text[stop0+3:stop1]
         if(stop2 == -1):
@@ -42,62 +42,53 @@ def splitLine(text, lastGuy, lastMsg):
         hour = ""
         guy = lastGuy
         msg = lastMsg + text
-    #print("time: "+time)
-    #print("guy: "+guy)
-    #print("msg: "+msg)
+    print("time: "+day+" - "+hour)
+    print("guy: "+guy)
+    print("msg: "+msg)
     return (day, hour, guy, msg)
+
+def writeMessage(message, guyL):
+    if(message[3]==""):
+        return
+    bubble = Frame(second_Frame, relief='groove', borderwidth=2, padx=5)
+    if(message[2] == guyL):    #Write message of person 1 with hour
+        bubble.configure(bg='#ffffff')
+        Label(bubble, text=message[2], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
+        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
+        Label(bubble, text=message[1], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
+        bubble.pack(pady=3, anchor='nw')
+    else:                       #Write message of person 2 with hour
+        bubble.configure(bg='#DCF8C6')
+        Label(bubble, text=message[2], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
+        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#DCF8C6').pack()
+        Label(bubble, text=message[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
+        bubble.pack(pady=3, anchor='ne', padx=20)
 
 def openFile():
     guyL = ""
-    lastDay = ""
-    lastHour = ""
-    lastGuy = ""
-    lastMsg = ""
+    lastMssg = ["", "", "", ""]
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
-    while True:
-    #for x in range(0, 1000):
+    #while True:
+    for x in range(0, 100):
         message = fileData.readline()
         if (message == ""):
             break
-        mssg = splitLine(message, lastGuy, lastMsg)
-        
-        if(mssg[2] == "whatsapp"):  #Write First info message
+        mssg = splitLine(message, lastMssg[2], lastMssg[3])
+
+        if(mssg[2] != "" and guyL == "" and mssg[2] != "whatsapp"):
+            guyL = mssg[2]       
+
+        if(mssg[2] == "whatsapp"):                          #Write whatsapp info message
+            Label(second_Frame, text=mssg[3], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5, font=('Helvetica', '8')).pack(anchor='n')
+            lastMssg[2] = mssg[2]
+        elif(lastMssg[0] != mssg[0] and mssg[0] != ""):     #Date changed -> write in chat
             Label(second_Frame, text=mssg[0], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
-            lastDay = mssg[0]
-            Label(second_Frame, text=mssg[3], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
-            lastGuy = "firstGuy"
-        elif(lastGuy == "firstGuy"):
-            lastHour = mssg[1]
-            lastGuy = mssg[2]
-            lastMsg = mssg[3]
-        elif(mssg[2] != lastGuy):
-            bubble = Frame(second_Frame, relief='groove', borderwidth=2, padx=5)
-            if(mssg[2] == guyL or guyL == ""):    #Write message of person 1 with hour
-                guyL = mssg[2]
-                bubble.configure(bg='#ffffff')
-                Label(bubble, text=lastMsg, wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
-                Label(bubble, text=lastHour, bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
-                bubble.pack(pady=3, anchor='nw')
-                lastGuy = guyL
-            else:                                   #Write message of person 2 with hour
-                bubble.configure(bg='#DCF8C6')
-                Label(bubble, text=lastMsg, wraplength=300, anchor='nw', justify='left', bg='#DCF8C6').pack()
-                Label(bubble, text=lastHour, bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
-                bubble.pack(pady=3, anchor='ne', padx=20)
-                lastGuy = mssg[2]
-            if(mssg[0] != lastDay and mssg[0] != ""):   #Write date in chat
-                Label(second_Frame, text=mssg[0], wraplength=300, anchor='nw', justify='center', relief='groove', bg='#E1F3FB', padx=5).pack(anchor='n')
-                lastDay = mssg[0]
-            lastDay = mssg[0]
-            lastHour = mssg[1]
-            lastMsg = mssg[3]
-        else:
-            lastMsg = mssg[3]
-        #lastDay = mssg[0]
-        #lastHour = mssg[1]
-        #lastGuy = mssg[2]
-        #lastMsg = mssg[3]
+        if(lastMssg[2] != mssg[2] and mssg[2] != "" and lastMssg[2] != "whatsapp"):       #Guy changed -> write message
+            writeMessage(lastMssg, guyL)
+        elif(lastMssg[1] != mssg[1] and mssg[1] != ""):     #Time changes -> write message
+            writeMessage(lastMssg, guyL)
+        lastMssg = mssg
 
 
 
