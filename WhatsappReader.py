@@ -47,7 +47,6 @@ def reloadConv():
     second_Frame = Frame(my_Canvas)
     my_Canvas.create_window((0, 0), window=second_Frame, anchor="nw")
     displayConv()
-    
 
 def splitLine(text, lastData):
     if(text[0] >= '0' and text[0] <= '9' and text[2] == '.'): #Check if is a date and hour
@@ -95,11 +94,15 @@ def openFile():
     global known
     global allData
     global maxData
+    global startMsg
     guyR = askstring("WhatsApp name", "Write your WhatsApp name or leave blank if you don't know")
     #print("guy name ;" + guyR + ";")
     if(not guyR == ""):
         known = True
     #print(known)
+    if(not allData == 0):
+        startMsg = 0
+        reloadConv()
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
     allData = fileData.read().split("\n")
@@ -111,7 +114,7 @@ def displayConv():
     lastMssg = ["", "", "", ""]
     #while True:
     if(startMsg - 400 >= 0):
-        Button(second_Frame, text="Load fewer", bg='#E1F3FB', command=loadFewer).pack()
+        Button(second_Frame, text="Load fewer", bg='#E1F3FB', command=loadFewer).pack(pady=5)
     for x in range(startMsg, startMsg+400):
         message = allData[x]
         #print("msg = ;" + message + ";")
@@ -137,7 +140,7 @@ def displayConv():
         lastMssg = mssg
     writeMessage(lastMssg) #Write last message
     if(startMsg + 400 <= maxData):
-        Button(second_Frame, text="Load further", bg='#E1F3FB', command=loadFurther).pack()
+        Button(second_Frame, text="Load further", bg='#E1F3FB', command=loadFurther).pack(pady=5)
 
 
 
