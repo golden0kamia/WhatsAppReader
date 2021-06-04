@@ -5,7 +5,8 @@ from tkinter.simpledialog import *
 
 #hourFont = tkFont.Font(family='Helvetica', size=36, weight='bold')
 
-win = Tk()
+win = Tk(className="Whatsapp Reader")
+win.geometry("400x750")
 
 main_Frame = Frame(win)
 main_Frame.pack(fill=BOTH, expand=1)
