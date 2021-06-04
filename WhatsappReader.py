@@ -26,6 +26,28 @@ my_Canvas.create_window((0, 0), window=second_Frame, anchor="nw")
 filePath = ""
 known = False
 guyR = ""
+startMsg = 0
+allData = 0
+maxData = 0
+
+def loadFewer():
+    global startMsg
+    startMsg -= 400
+    reloadConv()
+
+def loadFurther():
+    global startMsg
+    startMsg += 400
+    reloadConv()
+
+def reloadConv():
+    global second_Frame
+    global my_Canvas
+    second_Frame.destroy()
+    second_Frame = Frame(my_Canvas)
+    my_Canvas.create_window((0, 0), window=second_Frame, anchor="nw")
+    displayConv()
+    
 
 def splitLine(text, lastData):
     if(text[0] >= '0' and text[0] <= '9' and text[2] == '.'): #Check if is a date and hour
@@ -58,30 +80,40 @@ def writeMessage(message):
         bubble.configure(bg='#DCF8C6')
         if(not known):
             Label(bubble, text=message[2], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
-        Label(bubble, text=message[3][:-1], wraplength=300, anchor='nw', justify='right', bg='#DCF8C6').pack()
+        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='right', bg='#DCF8C6').pack()
         Label(bubble, text=message[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
         bubble.pack(pady=3, anchor='ne', padx=20)
     else:                       #Write message of people 2 with hour and name in the left part of the screen (whatsapp group is possible)
         bubble.configure(bg='#ffffff')
         Label(bubble, text=message[2], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
-        Label(bubble, text=message[3][:-1], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
+        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
         Label(bubble, text=message[1], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
         bubble.pack(pady=3, anchor='nw')
 
 def openFile():
     global guyR
     global known
-    guyR = askstring("WhatsApp name", "Write your WhatsApp name or leave blank")
-    print("guy name ;" + guyR + ";")
+    global allData
+    global maxData
+    guyR = askstring("WhatsApp name", "Write your WhatsApp name or leave blank if you don't know")
+    #print("guy name ;" + guyR + ";")
     if(not guyR == ""):
         known = True
-    print(known)
-    lastMssg = ["", "", "", ""]
+    #print(known)
     filePath = askopenfilename(title="Selectionner le fichier de discussion", filetypes=[('Text files','.txt')])
     fileData = open(filePath, mode='r',encoding='utf-8' )
+    allData = fileData.read().split("\n")
+    maxData = len(allData)
+    displayConv()
+
+def displayConv():
+    global guyR
+    lastMssg = ["", "", "", ""]
     #while True:
-    for x in range(0, 200):
-        message = fileData.readline()
+    if(startMsg - 400 >= 0):
+        Button(second_Frame, text="Load fewer", bg='#E1F3FB', command=loadFewer).pack()
+    for x in range(startMsg, startMsg+400):
+        message = allData[x]
         #print("msg = ;" + message + ";")
         if (message == ""):
             #print("File read ended")
@@ -104,6 +136,8 @@ def openFile():
             writeMessage(lastMssg)
         lastMssg = mssg
     writeMessage(lastMssg) #Write last message
+    if(startMsg + 400 <= maxData):
+        Button(second_Frame, text="Load further", bg='#E1F3FB', command=loadFurther).pack()
 
 
 
