@@ -72,6 +72,17 @@ def splitLine(text, lastData):
     #print("msg: "+msg)
     return (day, hour, guy, msg)
 
+def showMedia(media, bubble):
+    Label(bubble, text="MEDIA "+media[0]+" - "+media[1], wraplength=300).pack()
+    #TODO: Find file that matches metadata
+    # IMG-YYYYMMDD-WA####.jpg or
+    # VID-YYYYMMDD-WA####.mp4 or
+    # PTT-YYYYMMDD-WA####.opus or
+    # AUD-YYYYMMDD-WA####.mp3/opus or
+    # STK-YYYYMMDD-WA####.webp or
+    # random name document
+    return
+
 def writeMessage(message):
     if(message[3]==""):
         return
@@ -79,14 +90,20 @@ def writeMessage(message):
     if(message[2] == guyR):    #Write message of person 1 with hour in the right part of the screen
         bubble.configure(bg='#DCF8C6')
         if(not known):
-            Label(bubble, text=message[2], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
-        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='right', bg='#DCF8C6').pack()
+            Label(bubble, text=message[2], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
+        if(message[3] == "<Médias omis>"):
+            showMedia(message, bubble)
+        else:
+            Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='right', bg='#DCF8C6').pack()
         Label(bubble, text=message[1], bg='#DCF8C6', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
         bubble.pack(pady=3, anchor='ne', padx=20)
     else:                       #Write message of people 2 with hour and name in the left part of the screen (whatsapp group is possible)
         bubble.configure(bg='#ffffff')
         Label(bubble, text=message[2], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='nw')
-        Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
+        if(message[3] == "<Médias omis>"):
+            showMedia(message, bubble)
+        else:
+            Label(bubble, text=message[3], wraplength=300, anchor='nw', justify='left', bg='#ffffff').pack()
         Label(bubble, text=message[1], bg='#ffffff', fg='gray', font=('Helvetica', '8')).pack(anchor='ne')
         bubble.pack(pady=3, anchor='nw')
 
